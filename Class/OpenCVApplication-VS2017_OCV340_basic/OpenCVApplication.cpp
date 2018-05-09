@@ -857,7 +857,7 @@ void BFS() {
 			if (imgRead.at<uchar>(i, j) == 0 && labels.at<int>(i, j) == 0) {
 				label++;
 				labels.at<int>(i, j) = label;
-				Q.push( Point2i(i, j) );
+				Q.push(Point2i(i, j));
 
 				while (!Q.empty()) {
 					Point2i q = Q.front();
@@ -1071,7 +1071,7 @@ void reconstructContour() {
 
 	f.close();
 	imshow("contour", contour);
-	waitKey(0);	
+	waitKey(0);
 }
 
 Mat dilate(Mat img) {
@@ -1222,11 +1222,11 @@ Mat fill(Mat img) {
 
 	Mat imgC = 255 - img; //complement of img
 	Mat prevFilled = filled;
-	do{
+	do {
 		prevFilled = filled;
 		filled = dilate(filled);
-		filled = filled + imgC;	
-	} while (! cv::countNonZero(filled!=prevFilled) == 0);
+		filled = filled + imgC;
+	} while (!cv::countNonZero(filled != prevFilled) == 0);
 
 	filled = reunion(img, filled);
 
@@ -1287,7 +1287,7 @@ float computeSD() {
 	std::cout << "Standard Deviation: " << sd << std::endl;
 	getchar();
 	getchar();
-	
+
 
 	return sd;
 }
@@ -1329,7 +1329,7 @@ void thAlgo() {
 		for (int i = thC + 1; i <= iMax; ++i) {
 			if (i <= iMax) {
 				mean2 += (i * histo[i]);
-				N+=histo[i];
+				N += histo[i];
 			}
 		}
 		mean2 /= N;
@@ -1380,7 +1380,7 @@ void histoStrShr(int outMin, int outMax) {
 	img = outMin + (img - inMin) * factor;
 
 	imshow("histo str/shr", img);
-	
+
 	showHistogram("histoAfter", computeHistogram(img), 255, 500);
 
 	waitKey(0);
@@ -1446,7 +1446,7 @@ float* computePDF(Mat img) {
 		histoFloat[i] = (float)histoInt[i] / (float)M;
 	}
 
-//	showHistogram("PDF", histo, 256, 500);
+	//	showHistogram("PDF", histo, 256, 500);
 
 	return histoFloat;
 }
@@ -1504,7 +1504,7 @@ void convolution(Mat_<float> &filter, Mat_<uchar> &img, Mat_<uchar> &output) {
 			}
 		}
 	}
-	
+
 
 	// compute scaling coefficient and addition factor for low pass and high pass
 	// low pass: additionFactor = 0, scalingCoeff = sum of all elements
@@ -1599,7 +1599,7 @@ Mat generic_frequency_domain_filter(Mat src)
 	split(fourier, channels);  // channels[0] = Re (real part), channels[1] = Im (imaginary part)
 
 							   //calculate magnitude and phase in floating point images mag and phi
-							   // http://www3.ncc.edu/faculty/ens/schoenf/elt115/complex.html
+							   // http://w...content-available-to-author-only...c.edu/faculty/ens/schoenf/elt115/complex.html
 							   // from cartesian to polar coordinates
 
 	Mat mag, phi;
@@ -1634,7 +1634,7 @@ void medianFilter(Mat img, int w) {
 
 	std::cout << "---MEDIAN FILTER---\n";
 
-	Mat output(img.rows - 2*k, img.cols - 2*k, CV_8UC1);
+	Mat output(img.rows - 2 * k, img.cols - 2 * k, CV_8UC1);
 
 	for (int i = k; i < img.rows - k; i++) {
 		for (int j = k; j < img.cols - k; j++) {
@@ -1667,11 +1667,11 @@ Mat generateGaussFilter2d(int w) {
 
 	for (int i = 0; i < w; ++i) {
 		for (int j = 0; j < w; ++j) {
-			filter.at<float>(i, j) = 
+			filter.at<float>(i, j) =
 				exp(
-					-((i - middle) * (i - middle) + 
+					-((i - middle) * (i - middle) +
 					(j - middle) * (j - middle)) /
-					(2 * sigma*sigma)
+						(2 * sigma*sigma)
 				) /
 				scale;
 		}
@@ -1719,10 +1719,10 @@ void applyGaussFilter1d(Mat_<uchar> img, int w) {
 	std::vector<float> filter = generateGaussFilter1d(w);
 
 	int k = (w - 1 / 2);
-	Mat output(img.rows - 2*k, img.cols - 2*k, CV_8UC1);
+	Mat output(img.rows - 2 * k, img.cols - 2 * k, CV_8UC1);
 	float filter_sum = cv::sum(filter)[0];
 
-//	std::cout << img.cols << std::endl;
+	//	std::cout << img.cols << std::endl;
 
 	//for (int i = k; i < img.rows - k; ++i) {
 	//	for (int j = k; j < img.cols - k; ++j) {
@@ -1741,14 +1741,14 @@ void applyGaussFilter1d(Mat_<uchar> img, int w) {
 	//	}
 	//}
 
-	
-	
-	
-	
-	
+
+
+
+
+
 	sepFilter2D(img, output, 8, filter, filter);
 
-	
+
 
 
 
@@ -1757,7 +1757,198 @@ void applyGaussFilter1d(Mat_<uchar> img, int w) {
 	waitKey(0);
 }
 
-	
+int getDirection(float angle) {
+	float angleDegrees = angle;
+
+	if (angleDegrees >= 0 && angleDegrees < CV_PI / 8) {
+		return 2;
+	}
+	if ((angleDegrees >= CV_PI / 8) && angleDegrees < (3 * CV_PI) / 8) {
+		return 1;
+	}
+	if ((angleDegrees >= (3 * CV_PI) / 8 && angleDegrees < (5 * CV_PI) / 8)) {
+		return 0;
+	}
+	if ((angleDegrees >= (5 * CV_PI / 8) && angleDegrees < (7 * CV_PI) / 8)) {
+		return 3;
+	}
+	if ((angleDegrees >= (7 * CV_PI / 8)) && angleDegrees <= (8 * CV_PI) / 8 + 1.e10) {
+		return 2;
+	}
+
+}
+
+/*
+@percentHighLow - How much percent of High is Low
+*/
+
+void genAdaptiveThreshold(int *histogram, int totalNbPixels, float percentTotal, float percentHighLow, int &thLow, int &thHigh) {
+
+	int nbNonEdgePixels = (1 - (percentTotal / 100)) * (totalNbPixels - histogram[0]);
+	std::cout << "non edge pixels: " << nbNonEdgePixels << std::endl;
+	std::cout << "total number of pixels: " << totalNbPixels << std::endl;
+	std::cout << "histogram[0]: " << histogram[0] << std::endl;
+
+	int sum = 0;
+	int i;
+	for (i = 0; i < 256 && sum < nbNonEdgePixels; ++i, sum += histogram[i]) {
+		std::cout << "histogram[" << i << "] = " << histogram[i] << " sum= " << sum << "\n";
+	}
+	std::cout << sum << "\n";
+	std::cout << "i: " << i << std::endl;
+
+	thHigh = i;
+	thLow = percentHighLow / 100 * thHigh;
+
+	std::cout << "thHIGH: " << thHigh << "\n";
+	std::cout << "thLOW: " << thLow << "\n";
+
+
+}
+
+Mat_<uchar> hysteresis(Mat img, int thLow, int thHigh) {
+
+	int label = 0;
+	Mat labels = Mat::zeros(img.rows, img.cols, CV_32SC1);
+	Mat_<uchar> result = Mat::zeros(img.rows, img.cols, CV_8UC1);
+	//printf("rows = %d cols = %d\nimg: rows = %d cols = %d", labels.rows, labels.cols, img.rows, img.cols);
+	//scanf("%d", &label);
+	std::queue<Point2i> Q;
+
+	int kernel = 1;
+	for (int i = 0; i < img.rows; ++i) {
+		for (int j = 0; j < img.cols; ++j) {
+			if (img.at<uchar>(i, j) >= thHigh && labels.at<int>(i, j) == 0) {
+				label++;
+				labels.at<int>(i, j) = label;
+				result[i][j] = 255;
+				Q.push(Point2i(i, j));
+
+				while (!Q.empty()) {
+					Point2i q = Q.front();
+					Q.pop();
+					for (int ii = -kernel; ii <= kernel; ++ii) {
+						for (int jj = -kernel; jj <= kernel; ++jj) {
+							int iii = q.x + ii, jjj = q.y + jj;
+							if (inBounds(iii, jjj, img.rows, img.cols)) {
+								if (img.at<uchar>(iii, jjj) >= thLow && labels.at<int>(iii, jjj) == 0) {
+									result[iii][jjj] = 255;
+									labels.at<int>(iii, jjj) = label;
+									Q.push(Point2i(iii, jjj));
+								}
+							}
+						}
+					}
+				}
+
+			}
+		}
+	}
+
+	return result;
+
+}
+
+void edgeDetect(Mat imgSrc) {
+
+	//apply gaussian filter
+	Mat img;
+	cv::Size size(0, 0);
+	GaussianBlur(imgSrc, img, size, 0.8);
+	imshow("blurred", img);
+
+	Mat_<short int> gradX, gradY;
+
+	Mat_<int> sobelX, sobelY;
+	int kernel_size = 3;
+	sobelX = Mat::ones(kernel_size, kernel_size, CV_32S);
+	sobelY = Mat::ones(kernel_size, kernel_size, CV_32S);
+	sobelX[0][0] = -1; sobelX[0][1] = 0; sobelX[0][2] = 1;
+	sobelX[1][0] = -2; sobelX[1][1] = 0; sobelX[1][2] = 2;
+	sobelX[2][0] = -1; sobelX[2][1] = 0; sobelX[2][2] = 1;
+
+	sobelY[0][0] = +1; sobelY[0][1] = +2; sobelY[0][2] = +1;
+	sobelY[1][0] = +0; sobelY[1][1] = +0; sobelY[1][2] = +0;
+	sobelY[2][0] = -1; sobelY[2][1] = -2; sobelY[2][2] = -1;
+
+
+	filter2D(img, gradX, CV_16S, sobelX);
+	filter2D(img, gradY, CV_16S, sobelY);
+
+	Mat_<float> magnitude(gradX.rows, gradX.cols), orientation(gradX.rows, gradY.cols);
+	Mat_<uchar> magNormalized(magnitude.rows, magnitude.cols);
+
+	for (int i = 0; i < gradX.rows; ++i) {
+		for (int j = 0; j < gradX.cols; ++j) {
+			magnitude[i][j] = sqrt(gradX[i][j] * gradX[i][j] + gradY[i][j] * gradY[i][j]);
+			//magnitude[i][j] /= sqrt(2);
+			orientation[i][j] = atan2(gradY[i][j], gradX[i][j]);
+			//std::cout << orientation[i][j] << " ";
+			if (orientation[i][j] < 0) {
+				orientation[i][j] += CV_PI; //interval [0, PI]
+			}
+		}
+	}
+
+
+	cv::normalize(magnitude, magNormalized, 0, 255, NORM_MINMAX, CV_8UC1);
+	imshow("magNormalized", magNormalized);
+
+	Mat_<uchar> result(magnitude.rows, magnitude.cols);
+
+	int di1[] = { -1, -1, 0, +1 };
+	int dj1[] = { 0, +1, +1, +1 };
+
+	int di2[] = { +1, +1, 0, -1 };
+	int dj2[] = { 0, -1, -1, -1 };
+
+	for (int i = 1; i < result.rows - 1; ++i) {
+		for (int j = 1; j < result.cols - 1; ++j) {
+			//std::cout << "orient: " << orientation[i][j];
+			int dir = getDirection(orientation[i][j]);
+
+			//std::cout << i << " " << j << " " << dir << "\n";
+
+			//local maximum
+			if (magNormalized[i][j] > magNormalized[i + di1[dir]][j + dj1[dir]] &&
+				magNormalized[i][j] > magNormalized[i + di2[dir]][j + dj2[dir]]
+				)
+			{
+				result[i][j] = magNormalized[i][j];
+			}
+			else {
+				result[i][j] = 0;
+			}
+		}
+	}
+
+
+	imshow("edges", result);
+
+	int thLow, thHigh;
+	genAdaptiveThreshold(computeHistogram(magNormalized), (result.rows - 2) * (result.cols - 2), 10, 40, thLow, thHigh);
+
+	Mat_<uchar> resultThreshold(result);
+
+	for (int i = 0; i < resultThreshold.rows; ++i) {
+		for (int j = 0; j < resultThreshold.cols; ++j) {
+			if (resultThreshold[i][j] < thLow) {
+				resultThreshold[i][j] = 0;
+			}
+		}
+	}
+	imshow("edgedJustTh", resultThreshold);
+
+	resultThreshold = hysteresis(result, thLow, thHigh);
+
+	imshow("edgesTh", resultThreshold);
+
+	waitKey(0);
+}
+
+
+
+
 
 
 
@@ -1811,6 +2002,7 @@ int main()
 		printf(" 40 - Median Filter\n");
 		printf(" 41 - Apply Gauss Filter 2d\n");
 		printf(" 42 - Apply Gauss Filter 1d\n");
+		printf(" 43 - Edge Detect \n");
 		printf(" 0 - Exit\n\n");
 		printf("Option: ");
 		scanf("%d", &op);
@@ -2034,7 +2226,11 @@ int main()
 			img = imread("Images/noise_images/portrait_Gauss2.bmp", CV_LOAD_IMAGE_GRAYSCALE);
 			applyGaussFilter1d(img, 5);
 			break;
-		}	
+		case 43:
+			img = imread("Images/saturn.bmp", CV_LOAD_IMAGE_GRAYSCALE);
+			edgeDetect(img);
+			break;
+		}
 	} while (op != 0);
 
 	return 0;
